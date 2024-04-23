@@ -1,0 +1,12 @@
+/Amatsukaze/Version.h
+
+*.o
+*.so
+*.user
+bin
+lib
+/test
+/Amatsukaze/logo
+/Amatsukaze/tmp
+/.envrc
+/.direnv

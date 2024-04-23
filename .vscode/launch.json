@@ -1,0 +1,44 @@
+{
+	// IntelliSense を使用して利用可能な属性を学べます。
+	// 既存の属性の説明をホバーして表示します。
+	// 詳細情報は次を確認してください: https://go.microsoft.com/fwlink/?linkid=830387
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"name": "デバッグ: amatsukaze",
+			"type": "cppdbg",
+			"request": "launch",
+			"program": "${workspaceFolder}/Amatsukaze/bin/amatsukaze",
+			"args": [
+				"-i",
+				"${workspaceFolder}/test/test.ts",
+				"-o",
+				"${workspaceFolder}/test/test.mp4",
+				"-w",
+				"${workspaceFolder}/Amatsukaze/tmp",
+				"--dump",
+				"--chapter",
+				"--logo",
+				"${workspaceFolder}/Amatsukaze/logo/SID141-1.lgd",
+				"--ignore-no-logo"
+			],
+			"stopAtEntry": false,
+			"cwd": "${workspaceFolder}/Amatsukaze",
+			"externalConsole": false,
+			"MIMode": "gdb",
+			//"setupCommands": [
+            //    {"text": "-gdb-set follow-fork-mode child"}
+            //]
+		},
+		{
+			"name": "デバッグ: test",
+			"type": "cppdbg",
+			"request": "launch",
+			"program": "${workspaceFolder}/test/a.out",
+			"stopAtEntry": false,
+			"cwd": "${workspaceFolder}/test",
+			"externalConsole": false,
+			"MIMode": "gdb",
+		},
+	]
+}
