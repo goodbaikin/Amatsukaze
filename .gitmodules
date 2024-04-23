@@ -1,0 +1,6 @@
+[submodule "AviSynthPlus"]
+	path = AviSynthPlus
+	url = https://github.com/AviSynth/AviSynthPlus
+[submodule "FFmpeg"]
+	path = FFmpeg
+	url = https://github.com/FFmpeg/FFmpeg
