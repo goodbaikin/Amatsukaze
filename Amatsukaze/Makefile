@@ -1,6 +1,14 @@
-CFLAGS = -g3 -I../common -I../include -I../include_gpl -I./linux \
+CFLAGS = -I../common -I../include -I../include_gpl -I./linux \
 	-mavx -mavx2 -mfma\
 	-Wno-multichar -Wno-deprecated-declarations
+
+DEBUG = 0
+ifeq ($(DEBUG),1)
+	CFLAGS += -g3 -DDEBUG
+else
+	CFLAGS += -O3 -march=native -mtune=native
+endif
+
 CXXFLAGS = $(CFLAGS)
 OBJS = AdtsParser.o \
 	AMTLogo.o \
