@@ -22,6 +22,7 @@
               nasm
               cmake
               ninja
+              docker
             ];
           };
         }
