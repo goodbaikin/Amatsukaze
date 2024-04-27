@@ -10,6 +10,7 @@ TSファイルをエンコードしてmp4やmkvにするソフトです。
 
 ## ファイルの配置
 とりあえずのところ、 amatsukaze の実行ファイルが入っているディレクトリの横の lib/libamatsukaze.so を モジュールとして読み込むように実装しています。
+また lib/plugins64 以下に存在する AviSynth モジュールは自動的に読み込まれるようになっています。ロゴ消しの機能を使いたい場合は、[tobitti0/delogo-AviSynthPlus-Linux](https://github.com/tobitti0/delogo-AviSynthPlus-Linux)をビルドして、libdelogo.so をここに配置するようにしてください。
 この辺の設定で改善希望があれば Issue を上げてください。
 
 ```
@@ -20,6 +21,8 @@ TSファイルをエンコードしてmp4やmkvにするソフトです。
 	- ...
 - lib
 	- libamatsukaze.so
+  - plugins64
+    - libdelogo.so
 ```
 
 ## 使用方法

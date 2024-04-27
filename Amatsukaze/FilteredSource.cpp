@@ -415,6 +415,7 @@ void AMTFilterSource::defineMakeSource(
     sb.append("\tAMTSource(\"%s\")\n", setting_.getTmpAMTSourcePath(key.video).c_str());
     sb.append("\tif(mt) { Prefetch(1, 4) }\n");
 
+    /*
     int numEraseLogo = 0;
     auto eraseLogo = [&](const tstring& logopath, const tstring& logoFramePath, bool forceEnable) {
         if (forceEnable || File::exists(logoFramePath)) {
@@ -433,6 +434,11 @@ void AMTFilterSource::defineMakeSource(
     }
     if (numEraseLogo > 0) {
         sb.append("\tif(mt) { Prefetch(1, 4) }\n");
+    }
+    */
+
+    if (setting_.isNoDelogo() == false && logopath.size() > 0) {
+        sb.append("%s", logopath.c_str());
     }
 
     sb.append("\t");

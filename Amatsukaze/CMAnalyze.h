@@ -17,7 +17,6 @@
 
 #include "StreamUtils.h"
 #include "TranscodeSetting.h"
-#include "LogoScan.h"
 #include "ProcessThread.h"
 #include "PerformanceUtil.h"
 #include "StreamReform.h"
@@ -50,6 +49,7 @@ public:
     const std::vector<int>& getTrims() const { return trims; }
     const std::vector<EncoderZone>& getZones() const { return cmzones; }
     const std::vector<int>& getDivs() const { return divs; }
+    const std::string& getLogoFrameCmd() const { return logoFrameCmd; }
 
     // PMTïœçXèÓïÒÇ©ÇÁCMí«â¡îFéØ
     void applyPmtCut(
@@ -76,6 +76,7 @@ private:
     std::vector<EncoderZone> cmzones;
     std::vector<int> sceneChanges;
     std::vector<int> divs;
+    std::string logoFrameCmd;
 
     void analyzeLogo(const int videoFileIndex, const int numFrames, Stopwatch& sw, const tstring& avspath);
 
