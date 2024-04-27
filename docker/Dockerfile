@@ -1,4 +1,4 @@
-FROM debian:stable-slim
+FROM ubuntu:22.04
 ARG VERSION
 ENV VERSION=$VERSION
 
@@ -68,6 +68,11 @@ RUN git clone --depth 1 https://code.videolan.org/videolan/x264.git &&\
 	./configure &&\
 	make -j$(nproc) &&\
 	make install
+
+RUN git clone --depth 1 https://github.com/tobitti0/delogo-AviSynthPlus-Linux &&\
+	cd delogo-AviSynthPlus-Linux/src &&\
+	make &&\
+	cp libdelogo.so /usr/local/lib/plugins64/
 
 FROM ubuntu:22.04
 COPY --from=0 /usr/local /usr/local

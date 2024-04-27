@@ -24,7 +24,9 @@ OBJS = AdtsParser.o \
 	FilteredSource.o \
 	H264VideoParser.o \
 	InterProcessComm.o \
-	LogoScan.o \
+	Logoframe_det.o \
+	Logoframe_mul.o \
+	Logoframe.o \
 	Mpeg2TsParser.o \
 	Mpeg2VideoParser.o \
 	Muxer.o \
@@ -49,7 +51,7 @@ BIN = lib/libamatsukaze.so bin/amatsukaze
 %.o: %.cpp
 	g++ -c -fPIC $(CXXFLAGS) $^ -o $@
 %.o: %.c
-	gcc -c -fPIC $(CFLAGS) $^ -o $@
+	g++ -c -fPIC $(CFLAGS) $^ -o $@
 
 all: $(BIN)
 
@@ -64,6 +66,7 @@ bin/amatsukaze: main.cpp $(OBJS)
 	-@mkdir bin
 	g++ $(CXXFLAGS) main.cpp -I../include -o $@ $(OBJS) -lavcodec -lavformat -lavutil -lcrypto -lfaad -lcaptionmod2
 install: $(BIN)
+	mkdir /usr/local/lib/plugins64
 	cp lib/libamatsukaze.so /usr/local/lib/
 	cp bin/amatsukaze /usr/local/bin/
 clean:

@@ -7,6 +7,7 @@
 */
 
 #include <future>
+#include <cmath>
 #include "CMAnalyze.h"
 
 CMAnalyze::CMAnalyze(AMTContext& ctx,
@@ -238,103 +239,86 @@ void CMAnalyze::makePreamble(IScriptEnvironment2* env) {
     env->AddAutoloadDir((GetModuleDirectory()+"/plugins64").c_str(), true);
 }
 
-#include <dlfcn.h>
+#include "Logoframe.h"
+extern int Logoframe(const char* avsfile, MLOGO_DATASET& logodata);
+extern int MultLogo_FileStrGet(char** name_dst, const char* name_src);
+extern void LogoWriteFind(LOGO_DATASET *pl, FILE *fpo_ana);
 
 void CMAnalyze::logoFrame(const int videoFileIndex, const int numFrames, const tstring& avspath) {
     const auto& logoPath = setting_.getLogoPath();
     const auto& eraseLogoPath = setting_.getEraseLogoPath();
-
     std::vector<tstring> allLogoPath = logoPath;
     allLogoPath.insert(allLogoPath.end(), eraseLogoPath.begin(), eraseLogoPath.end());
-    logo::LogoFrame logof(ctx, allLogoPath, 0.35f);
 
-    if (trims.size() > 0 && (trims.size() % 2) == 0) {
-        ctx.infoF("解析範囲");
-        for (int i = 0; i < trims.size() / 2; i++) {
-            ctx.infoF(" %6d-%6d", trims[2 * i], trims[2 * i + 1]);
-        }
+    MLOGO_DATASET logodata;
+    MultLogoInit( &logodata );
+    for (int i=0; i<allLogoPath.size() && i<LOGONUM_MAX; i++) {
+        MultLogo_FileStrGet(&(logodata.all_logofilename[i]), allLogoPath[i].c_str());
     }
-    int duration = 0;
-    const int processorCount = GetProcessorCount();
-    const int minFramesPerThread = 600;
-    const int totalThreads = (setting_.isParallelLogoAnalysis()) ? std::max(1, std::min(processorCount, std::min(8, (numFrames + minFramesPerThread/2) / minFramesPerThread))) : 1;
-    const int decodeThreads = std::max(1, std::min(totalThreads > 1 ? 4 : 8, processorCount / totalThreads));
-    if (totalThreads > 1) {
-        ctx.infoF("並列ロゴ解析 %d並列 x デコード%dスレッド", totalThreads, decodeThreads);
-    }
-    std::vector<std::future<std::pair<int, std::string>>> logoScanThreads;
-
-    void *handle = dlopen("libavisynth.so", RTLD_LAZY);
-	if (handle == NULL) {
-		perror("Cannot load libavisynth.so");
-		return;
-	}
-	void *mkr = dlsym(handle, "CreateScriptEnvironment2");
-	if(mkr == NULL) {
-		perror("Cannot find CreateScriptEnvironment2");
-		return;
-	}
-	typedef IScriptEnvironment2 * (* func_t)(int);
-	func_t CreateScriptEnvironment2 = (func_t)mkr;
-	ScriptEnvironmentPointer env = make_unique_ptr(CreateScriptEnvironment2(AVISYNTH_INTERFACE_VERSION));
-    if (AVS_linkage == nullptr) {
-  	    AVS_linkage = env->GetAVSLinkage();
+    
+    int ret = Logoframe(avspath.c_str(), logodata); 
+    if (ret != 0) {
+        MultLogoFree(&logodata);
+        THROWF(RuntimeException, "ロゴ解析に失敗\n");
+        return;
     }
 
-    for (int ith = 0; ith < totalThreads; ith++) {
-        logoScanThreads.push_back(std::async(std::launch::async, [&](const int threadID) {
-            try {
-                AVSValue result;
-                makePreamble(env.get());
-                env->LoadPlugin(to_string(GetModulePath()).c_str(), true, &result);
-                const auto amtsourcePath = to_string(setting_.getTmpAMTSourcePath(videoFileIndex));
-                AVSValue up_args[4] = { amtsourcePath.c_str(), "", false, decodeThreads };
-                PClip clip = env->Invoke("AMTSource", AVSValue(up_args, std::size(up_args))).AsClip();
+    StringBuilder sb;
+    int max_find = 0;
 
-                auto vi = clip->GetVideoInfo();
-                if (threadID == 0) {
-                    logof.setClipInfo(clip);
-                    duration = vi.num_frames * vi.fps_denominator / vi.fps_numerator;
+    // ロゴ消し用 avs スクリプトの内容を保存
+    for(int index = 0; index < LOGONUM_MAX; index++){
+        MLOGO_DATASET* pml = &logodata;
+        const char* logofname  = pml->all_logofilename[index];
+        LOGO_DATASET* logo         = pml->all_logodata[index];
+        int outform = pml->outform;
+
+        if (logofname != NULL && pml->total_valid[index] > 0) {
+           LOGO_FRAMEREC *plogof = &(logo->framedat);
+
+            for(int i=0; i<plogof->num_find; i++){
+                if (outform == 1){
+                    // when fade set, not set interlace
+                    int intl_rise = plogof->res[i].intl_rise;
+                    int intl_fall = plogof->res[i].intl_fall;
+                    if (plogof->res[i].fade_rise > 1){
+                        intl_rise = 0;
+                    }
+                    if (plogof->res[i].fade_fall > 1){
+                        intl_fall = 0;
+                    }
+                    // output
+                    sb.append("\t%s(logofile=\"%s\", start=%ld, end=%ld, itype_s=%d, itype_e=%d, fadein=%d, fadeout=%d)\n", "ExtErsLOGO", logofname,
+                        plogof->res[i].frm_rise, plogof->res[i].frm_fall,
+                        intl_rise, intl_fall,
+                        plogof->res[i].fade_rise, plogof->res[i].fade_fall);
+                } else {
+                    sb.append("\t%s(logofile=\"%s\", start=%ld, end=%ld, fadein=%d, fadeout=%d)\n", "EraseLOGO", logofname, 
+                        plogof->res[i].frm_rise, plogof->res[i].frm_fall,
+                        plogof->res[i].fade_rise, plogof->res[i].fade_fall);
                 }
-
-                logof.scanFrames(clip, trims, threadID, totalThreads, env.get());
-            } catch (const AvisynthError& avserror) {
-                return std::pair<int, std::string>{ 1, avserror.msg };
             }
-            return std::pair<int, std::string>{ 0, "" };
-        }, ith));
-        // duration が設定されるまで2スレッド目以降の起動を待機する
-        if (ith == 0) {
-            while (duration == 0) {
-                std::this_thread::sleep_for(std::chrono::milliseconds(1));
+
+            // 最も発見フレーム数が多いファイル名を設定
+            if (max_find < plogof->num_find) {
+                max_find = plogof->num_find;
+                logopath = logofname;
             }
-        }
-    }
-    for (size_t ith = 0; ith < logoScanThreads.size(); ith++) {
-        const auto& result = logoScanThreads[ith].get();
-        if (result.first != 0) {
-            THROWF(AviSynthException, "logo scan #%d: %s", ith, result.second.c_str());
-        }
-    }
 
-    if (logoPath.size() > 0) {
-#if 0
-        logof.dumpResult(setting_.getTmpLogoFramePath(videoFileIndex));
-#endif
-        logof.selectLogo(trims, (int)logoPath.size());
-        logof.writeResult(setting_.getTmpLogoFramePath(videoFileIndex));
-
-        float threshold = setting_.isLooseLogoDetection() ? 0.03f : (duration <= 60 * 7) ? 0.03f : 0.1f;
-        if (logof.getLogoRatio() < threshold) {
-            ctx.info("この区間はマッチするロゴはありませんでした");
-        } else {
-            logopath = setting_.getLogoPath()[logof.getBestLogo()];
+            // ロゴ情報書き出し
+            tstring logoframePath = setting_.getTmpLogoFramePath(videoFileIndex, index-1);
+            FILE* fp = fopen(logoframePath.c_str(), "w");
+            if (fp == NULL) {
+                THROWF(RuntimeException, "ロゴ情報の書き出しに失敗");
+            }
+            LogoWriteFind(logo, fp);
+            fclose(fp);
         }
-    }
+	}
 
-    for (int i = 0; i < (int)eraseLogoPath.size(); ++i) {
-        logof.writeResult(setting_.getTmpLogoFramePath(videoFileIndex, i), (int)logoPath.size() + i);
-    }
+    // 終了
+    MultLogoFree(&logodata);
+    logoFrameCmd = sb.str();
 }
 
 tstring CMAnalyze::MakeChapterExeArgs(int videoFileIndex, const tstring& avspath) {
