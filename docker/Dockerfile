@@ -7,9 +7,20 @@ RUN apt-get update &&\
 		make \
 		cmake \
 		nasm \
+		pkg-config \
 		ninja-build \
 		libssl-dev \
+		libmfx-dev \
 		zlib1g-dev
+
+RUN git clone --depth 1 -b n4.4.2 https://github.com/FFmpeg/FFmpeg &&\
+	cd FFmpeg &&\
+	./configure \
+		--enable-shared \
+		--enable-pic \
+		--enable-libmfx &&\
+	make -j$(nproc) &&\
+	make install
 
 RUN git clone --depth 1 -b v3.7.3 https://github.com/AviSynth/AviSynthPlus &&\
 	cd AviSynthPlus &&\
@@ -18,12 +29,6 @@ RUN git clone --depth 1 -b v3.7.3 https://github.com/AviSynth/AviSynthPlus &&\
 	cmake .. -GNinja &&\
 	ninja &&\
 	ninja install
-
-RUN git clone --depth 1 -b n4.4.2 https://github.com/FFmpeg/FFmpeg &&\
-	cd FFmpeg &&\
-	./configure --enable-shared --enable-pic &&\
-	make -j$(nproc) &&\
-	make install
 
 RUN git clone https://github.com/tobitti0/join_logo_scp &&\
 	cd join_logo_scp/src &&\
