@@ -189,7 +189,7 @@ static std::unique_ptr<ConfigWrapper> parseArgs(AMTContext& ctx, int argc, const
 #else
     conf.encoderPath = _T("x264");
     conf.timelineditorPath = _T("timelineeditor");
-    conf.mp4boxPath = _T("mp4box");
+    conf.mp4boxPath = _T("MP4Box");
     conf.mkvmergePath = _T("mkvmerge");
     conf.chapterExePath = _T("chapter_exe");
     conf.joinLogoScpPath = _T("join_logo_scp");
