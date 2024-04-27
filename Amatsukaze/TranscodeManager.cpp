@@ -660,7 +660,7 @@ void DoBadThing() {
         const CMAnalyze* cma = cmanalyze[key.video].get();
 
         AMTFilterSource filterSource(ctx, setting, reformInfo,
-            cma->getZones(), cma->getLogoPath(), key, rm);
+            cma->getZones(), cma->getLogoFrameCmd(), key, rm);
 
         try {
             PClip filterClip = filterSource.getClip();

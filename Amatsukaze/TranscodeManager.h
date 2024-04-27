@@ -18,7 +18,6 @@
 #include "Encoder.h"
 #include "Muxer.h"
 #include "StreamReform.h"
-#include "LogoScan.h"
 #include "CMAnalyze.h"
 #include "InterProcessComm.h"
 #include "CaptionData.h"

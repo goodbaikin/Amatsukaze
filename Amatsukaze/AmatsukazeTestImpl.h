@@ -10,7 +10,6 @@
 #pragma once
 
 #include "TranscodeManager.h"
-#include "LogoScan.h"
 
 namespace test {
 

@@ -53,8 +53,8 @@ extern "C" __declspec(dllexport) const char* __stdcall AvisynthPluginInit3(IScri
 
     env->AddFunction("AMTSource", "s[filter]s[outqp]b[threads]i", av::CreateAMTSource, 0);
 
-    env->AddFunction("AMTAnalyzeLogo", "cs[maskratio]i", logo::AMTAnalyzeLogo::Create, 0);
-    env->AddFunction("AMTEraseLogo", "ccs[logof]s[mode]i[maxfade]i", logo::AMTEraseLogo::Create, 0);
+    //env->AddFunction("AMTAnalyzeLogo", "cs[maskratio]i", logo::AMTAnalyzeLogo::Create, 0);
+    //env->AddFunction("AMTEraseLogo", "ccs[logof]s[mode]i[maxfade]i", logo::AMTEraseLogo::Create, 0);
 
     env->AddFunction("AMTDecimate", "c[duration]s", AMTDecimate::Create, 0);
 
