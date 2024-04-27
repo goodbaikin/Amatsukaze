@@ -65,7 +65,7 @@ SubProcess::SubProcess(const tstring& args, const bool disablePowerThrottoling) 
         }
         argv[argsVec.size()] = NULL;
 
-        execv(cmd, (char**)argv);
+        execvp(cmd, (char**)argv);
         THROWF(RuntimeException, "プロセス起動に失敗: %s", strerror(errno));
         break;
     default:
