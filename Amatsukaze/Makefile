@@ -66,7 +66,6 @@ bin/amatsukaze: main.cpp $(OBJS)
 	-@mkdir bin
 	g++ $(CXXFLAGS) main.cpp -I../include -o $@ $(OBJS) -lavcodec -lavformat -lavutil -lcrypto -lfaad -lcaptionmod2
 install: $(BIN)
-	mkdir /usr/local/lib/plugins64
 	cp lib/libamatsukaze.so /usr/local/lib/
 	cp bin/amatsukaze /usr/local/bin/
 clean:
