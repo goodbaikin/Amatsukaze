@@ -1,7 +1,4 @@
 FROM ubuntu:22.04
-ARG VERSION
-ENV VERSION=$VERSION
-
 RUN apt-get update &&\
 	apt-get install -y \
 		gcc \
@@ -14,30 +11,17 @@ RUN apt-get update &&\
 		libssl-dev \
 		zlib1g-dev
 
-RUN git clone --recursive --depth 1 -b ${VERSION} https://github.com/goodbaikin/Amatsukaze
-
-RUN cd Amatsukaze/AviSynthPlus &&\
+RUN git clone --depth 1 -b v3.7.3 https://github.com/AviSynth/AviSynthPlus &&\
+	cd AviSynthPlus &&\
 	mkdir build &&\
 	cd build &&\
 	cmake .. -GNinja &&\
 	ninja &&\
 	ninja install
 
-RUN cd Amatsukaze/FFmpeg &&\
+RUN git clone --depth 1 -b n4.4.2 https://github.com/FFmpeg/FFmpeg &&\
+	cd FFmpeg &&\
 	./configure --enable-shared --enable-pic &&\
-	make -j$(nproc) &&\
-	make install
-
-RUN cd Amatsukaze/libfaad &&\
-	make -j$(nproc) &&\
-	make install
-
-RUN cd Amatsukaze/TVCaptionModLinux &&\
-	make -j$(nproc) &&\
-	make install
-
-RUN cd Amatsukaze/Amatsukaze &&\
-	./Version.sh &&\
 	make -j$(nproc) &&\
 	make install
 
@@ -72,10 +56,27 @@ RUN git clone --depth 1 https://code.videolan.org/videolan/x264.git &&\
 RUN git clone --depth 1 https://github.com/tobitti0/delogo-AviSynthPlus-Linux &&\
 	cd delogo-AviSynthPlus-Linux/src &&\
 	make &&\
+	mkdir /usr/local/lib/plugins64 &&\
 	cp libdelogo.so /usr/local/lib/plugins64/
 
+ARG VERSION
+ENV VERSION=$VERSION	
+RUN git clone --depth 1 -b ${VERSION} https://github.com/goodbaikin/Amatsukaze
+
+RUN cd Amatsukaze/libfaad &&\
+make -j$(nproc) &&\
+make install
+
+RUN cd Amatsukaze/TVCaptionModLinux &&\
+	make -j$(nproc) &&\
+	make install
+
+RUN cd Amatsukaze/Amatsukaze &&\
+	./Version.sh &&\
+	make -j$(nproc) &&\
+	make install
+
 FROM ubuntu:22.04
-COPY --from=0 /usr/local /usr/local
 RUN apt-get update &&\
 	apt-get install -y \
 		wget \
@@ -101,3 +102,5 @@ RUN apt-get update &&\
 	rm -rf /var/lib/apt/lists &&\
 	rm -rf /var/cache/* &&\
 	rm -rf /tmp/*
+COPY --from=0 /usr/local /usr/local
+RUN ldconfig
