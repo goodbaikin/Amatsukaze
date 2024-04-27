@@ -36,18 +36,7 @@ std::string GetModuleDirectory() {
 }
 
 std::string SearchExe(const std::string& name) {
-    char arg1[20];
-    char exepath[PATH_MAX + 1] = {0};
-
-    sprintf( arg1, "/proc/%d/exe", getpid() );
-    readlink( arg1, exepath, PATH_MAX );
-    char* basepath = dirname(exepath);
-
-    std::filesystem::path path(std::string(basepath) + "/" + name);    
-    if (std::filesystem::exists(path)) {
-        return path.string();
-    }
-    return std::string("");
+   return name;
 }
 
 //std::wstring GetDirectoryPath(const std::wstring& name) {
