@@ -1288,7 +1288,7 @@ void MultLogoDisplayParam(MLOGO_DATASET* pml){
 				strcpy(str_offwidth, "");
 			}
 			// display
-			printf("logo%d:%s\n", i+1, pml->all_logofilename[i]);
+			fprintf(stderr, "logo%d:%s\n", i+1, pml->all_logofilename[i]);
 #ifdef DEBUG_PRINT
 			printf("logo%d:loc(%d,%d) %dx%d Edge:%ld(%d) Sum:(%ld,%ld)-(%ld,%ld)%ld/%ld(%d/%d)\n",
 				i+1,
@@ -1302,13 +1302,13 @@ void MultLogoDisplayParam(MLOGO_DATASET* pml){
 #endif
 
 			if (plogo->thresdat.auto_bs11 == 2){
-				printf("detect:BS11\n");
+				fprintf(stderr, "detect:BS11\n");
 			}
-			printf("params fadein:%d fadeout:%d mrgleft:%d mrgright:%d %s\n", 
+			fprintf(stderr, "params fadein:%d fadeout:%d mrgleft:%d mrgright:%d %s\n", 
 				plogo->thresdat.num_fadein,  plogo->thresdat.num_fadeout,
 				plogo->thresdat.num_cutleft, plogo->thresdat.num_cutright,
 				str_autofade );
-			printf("       onwidth:%d%s onlevel:%d Y:%d-%d Yedge:%d Ydif:%d Yoffedg:%d\n",
+			fprintf(stderr, "       onwidth:%d%s onlevel:%d Y:%d-%d Yedge:%d Ydif:%d Yoffedg:%d\n",
 				plogo->thresdat.num_onwidth, str_offwidth,
 				plogo->thresdat.num_onlevel,
 				plogo->thresdat.thres_ymin, plogo->thresdat.thres_ymax,

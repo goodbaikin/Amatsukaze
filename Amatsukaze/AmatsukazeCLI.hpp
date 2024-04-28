@@ -560,7 +560,7 @@ static void amatsukaze_av_log_callback(
         const char* level_str =
             (logtype >= sizeof(log_levels) / sizeof(log_levels[0]))
             ? "unk" : log_levels[logtype];
-        fprintf(stderr, "FFMPEG [%s] %s", level_str, buf);
+        //fprintf(stderr, "FFMPEG [%s] %s", level_str, buf);
     } else {
         fprintf(stderr, "%s", buf);
     }
