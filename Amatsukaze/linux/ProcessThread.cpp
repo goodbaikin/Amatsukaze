@@ -26,7 +26,32 @@ std::vector<std::string> split(const std::string& src, const char* delim = " ") 
         }
     }
 
-    return vec;
+    std::vector<std::string> vec2;
+    for (int i=0; i<vec.size(); i++) { 
+        if (vec[i][0]=='\"' && vec[i].back() != '"') {
+            int lastIndex;
+            for (lastIndex=i; lastIndex<vec.size(); lastIndex++) {
+                if (vec[lastIndex].back() == '"') break;
+            }
+
+            std::string str = vec[i].substr(1);
+            for (int j=i+1; j<=lastIndex-1; j++) {
+                str += " ";
+                str += vec[j].c_str();
+            }
+            str += " ";
+            str += vec[lastIndex].substr(0, vec[lastIndex].size()-1);
+
+            vec2.push_back(str);
+            i=lastIndex;
+        } else if (vec[i][0] == '\"' && vec[i].back() == '\"'){
+            vec2.push_back(vec[i].substr(1, vec[i].size()-2));
+        } else {
+            vec2.push_back(vec[i]);
+        }
+    }
+
+    return vec2;
 }
 
 SubProcess::SubProcess(const tstring& args, const bool disablePowerThrottoling) :
