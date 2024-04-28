@@ -330,7 +330,7 @@ bool sarValid(const std::pair<int, int>& sar) {
             needSubs = false;
         }
         tstring dst = (needTimecode || needChapter || needSubs) ? tmpout1path : outpath;
-        sb.append(_T(" -new %s"), dst.c_str());
+        sb.append(_T(" -new \"%s\""), dst.c_str());
         ret.push_back(std::make_pair(sb.str(), true));
         sb.clear();
 
@@ -364,7 +364,7 @@ bool sarValid(const std::pair<int, int>& sar) {
             if (needChapter) {
                 sb.append(_T(" -chap %s"), chapterpath.c_str());
             }
-            sb.append(_T(" -new %s"), outpath.c_str());
+            sb.append(_T(" -new \"%s\""), outpath.c_str());
             ret.push_back(std::make_pair(sb.str(), true));
             sb.clear();
         }
@@ -429,7 +429,7 @@ bool sarValid(const std::pair<int, int>& sar) {
                 //}
             }
             //sb.append(_T("\""));
-            sb.append(_T(" -new %s"), tmpout1path.c_str());
+            sb.append(_T(" -new \"%s\""), tmpout1path.c_str());
             ret.push_back(std::make_pair(sb.str(), true));
             sb.clear();
             tmppath = tmpout1path;
